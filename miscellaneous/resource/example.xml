@@ -1,0 +1,42 @@
+<?xml version= "1.0" encoding= "utf-8" ?>
+<Family Name= 'Smith_Family' Type ="Rich">
+        <Father character= 'Strong'>
+                <name>John Smith</name>
+                <Height>175</Height>
+                <Weight>75</Weight>
+                <age>40</age>
+        </Father>
+
+        <Monther character= 'Beautiful'>
+                <name>Cherry Li</name>
+                <Height>170</Height>
+                <Weight>60</Weight>
+                <age>35</age>
+        </Monther>
+
+        <Childs character= "Lovely">
+                <child character= 'First'>
+                        <name>Jack</name>
+                        <Height>80</Height>
+                        <Weight>30</Weight>
+                        <age>4</age>
+                        <sex>Male</sex>
+                </child>
+
+                <child character= 'Second'>
+                        <name>Tomny</name>
+                        <Height>75</Height>
+                        <Weight>25</Weight>
+                        <age>3</age>
+                        <sex>Female</sex>
+                </child>
+
+                <child character= 'Threeth'>
+                        <name>Jhon</name>
+                        <Height>75</Height>
+                        <Weight>25</Weight>
+                        <age>3</age>
+                        <sex>Male</sex>
+                </child>
+        </Childs>
+</Family>
