@@ -18,6 +18,10 @@ class BaseDB(object):
             raise DBError(e)
         else:
             self.cursor = self.conn.cursor()
+            #   buffered=None, raw=None, prepared=None, cursor_class=None,
+            #   dictionary=None, named_tuple=None
+            #   you can use any method you like, just like: self.conn.cursor(dictionary=True) or
+            #   self.conn.cursor(buffered=True, dictionary=True) and so on .....
 
     def commit_or_rollback(self, sqlcmd):
         try:
@@ -29,3 +33,6 @@ class BaseDB(object):
             self.conn.commit()
 
     # TODO: add more function to check the mysql status or some set functions
+
+    def __del__(self):
+        self.conn.close()
