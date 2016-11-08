@@ -77,8 +77,10 @@ class BaseFtp(object):
 
     def download(self, file):
         download_file = open(file, "wb").write
+        # 根据 ftplib 源码 retrbinary 的第2个参数为callback 方法. 此callback 会将 socket 收到的file data
+        # 以参数的形式写入, 所以这边需要将file 的write 方法 取了个download_file 名字.
         try:
-            self.myftp.retrbinary('RETR %s' %f, download_file)
+            self.myftp.retrbinary('RETR %s' %file, download_file)
         except:
             raise FtpDownloadError('Download {} Failed'.format(file))
         else:

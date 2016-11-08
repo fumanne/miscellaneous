@@ -94,7 +94,6 @@ class BaseSendEmail(object):
             self.status = "OK"
 
     # TODO:  add more function like login, Reciever, or split the mail content  into  independent type!
-
     @property
     def sends_status(self):
         return self.status

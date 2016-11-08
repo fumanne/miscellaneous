@@ -53,3 +53,7 @@ class XMLParseError(Exception):
     """
     pass
 
+class CacheError(Exception):
+    """
+    add file into Differ exception
+    """
