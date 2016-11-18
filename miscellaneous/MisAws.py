@@ -36,7 +36,6 @@ class SimplyAWSAbstract(metaclass=ABCMeta):
     def _connect_to_region(self, **kwargs):
         raise NotImplementedError
 
-
     def all_region(self, name='ec2'):
         return get_regions(name)
 
