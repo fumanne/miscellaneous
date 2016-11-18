@@ -108,7 +108,7 @@ class Resource(object):
         _filename = 'resource/ip.tsv'
         _abs_filename = os.path.join(os.path.dirname(__file__), '..', _filename)
         if not os.path.exists(_abs_filename):
-            raise FileNotFoundError("Not Found {}, use Update to Download".format(_abs_filename))
+            raise FileNotFoundError("Not Found {}, Pls touch a ip file".format(_abs_filename))
         self._filename = _abs_filename
 
     @property
