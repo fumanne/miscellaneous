@@ -14,6 +14,7 @@ from boto.rds import RDSConnection
 from boto.iam import IAMConnection
 from boto.elasticache.layer1 import ElastiCacheConnection
 
+
 class SimplyAWSAbstract(metaclass=ABCMeta):
     def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, region=None, **kwargs):
         self.aws_access_key_id = aws_access_key_id
@@ -86,7 +87,6 @@ class S3(SimplyAWSAbstract):
         self.name = self.__class__.__name__.lower()
         self.con = self._connect_to_region(**kwargs)
 
-
     def _connect_to_region(self, **kwargs):
         return S3Connection(aws_access_key_id=self.aws_access_key_id,
                             aws_secret_access_key=self.aws_secret_access_key, **kwargs)
@@ -130,6 +130,7 @@ class ElastiCache(SimplyAWSAbstract):
                                      aws_secret_access_key=self.aws_secret_access_key,
                                      region=self.region, **kwargs)
 
+
 class IAM(SimplyAWSAbstract):
     def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, **kwargs):
         super(IAM, self).__init__(self, aws_access_key_id, aws_secret_access_key, **kwargs)
@@ -139,6 +140,3 @@ class IAM(SimplyAWSAbstract):
     def _connect_to_region(self, **kwargs):
         return IAMConnection(aws_access_key_id=self.aws_access_key_id,
                              aws_secret_access_key=self.aws_secret_access_key, **kwargs)
-
-
-

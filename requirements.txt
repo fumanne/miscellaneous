@@ -1,5 +1,12 @@
+boto==2.43.0
+datestuff==0.2.0
+dulwich==0.15.0
 mysql-connector-python==2.1.4
+psutil==4.4.2
 py==1.4.31
 pytest==3.0.3
+redis==2.10.5
 requests==2.11.1
 six==1.10.0
+slacker==0.9.29
+xmljson==0.1.7
