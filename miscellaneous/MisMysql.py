@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
 import mysql.connector as mc
-from .MisExceptions import DBError
+from miscellaneous.MisExceptions import DBError
 
 
 class BaseDB(object):

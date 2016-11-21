@@ -10,7 +10,7 @@ python有三种方法解析XML，SAX，DOM，以及ElementTree:
 
 
 from xml.dom import minidom
-from .MisExceptions import XMLParseError
+from miscellaneous.MisExceptions import XMLParseError
 
 
 class BaseDomXML(object):

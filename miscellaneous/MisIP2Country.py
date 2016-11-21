@@ -6,8 +6,8 @@ import struct
 import re
 import sqlite3
 from collections import namedtuple
-from .MisExceptions import FileNotFoundError
-from .MisExceptions import IP2CountryStatusError
+from miscellaneous.MisExceptions import FileNotFoundError
+from miscellaneous.MisExceptions import IP2CountryStatusError
 from urllib.request import urlopen
 
 
@@ -15,8 +15,8 @@ class IP2Country(object):
     IP_REGEX = "^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
 
     def __init__(self):
-        self.DBSearcher = None
-        self.FileSearcher = None
+        self._DBSearcher = None
+        self._FileSearcher = None
 
     def set(self, method="db"):
         """
@@ -25,22 +25,22 @@ class IP2Country(object):
         """
 
         if method == 'file':
-            self.FileSearcher = FileSearcher()
-            self.DBSearcher = None
+            self._FileSearcher = FileSearcher()
+            self._DBSearcher = None
         elif method == 'db':
-            self.DBSearcher = DBSearcher()
-            self.FileSearcher = None
+            self._DBSearcher = DBSearcher()
+            self._FileSearcher = None
 
     @property
     def method(self):
-        if self.FileSearcher:
-            return self.FileSearcher
-        if self.DBSearcher:
-            return self.DBSearcher
+        if self._FileSearcher:
+            return self._FileSearcher
+        if self._DBSearcher:
+            return self._DBSearcher
 
     @property
     def status(self):
-        return self.FileSearcher is not None or self.DBSearcher is not None
+        return self._FileSearcher is not None or self._DBSearcher is not None
 
     @staticmethod
     def filter_wrong_ip(ip):
@@ -56,11 +56,11 @@ class IP2Country(object):
             raise IP2CountryStatusError("is not set")
         result = dict()
         for i in filter(self.filter_wrong_ip, args):
-            if self.FileSearcher:
-                result[i] = self.FileSearcher.search(i)
+            if self._FileSearcher:
+                result[i] = self._FileSearcher.search(i)
 
-            if self.DBSearcher:
-                result[i] = self.DBSearcher.search(i)
+            if self._DBSearcher:
+                result[i] = self._DBSearcher.search(i)
         return result
 
     @classmethod
@@ -106,7 +106,7 @@ class IPv4Range(namedtuple('IPv4Range', ['start_long_ip', 'end_long_ip', 'countr
 class Resource(object):
     def __init__(self):
         _filename = 'resource/ip.tsv'
-        _abs_filename = os.path.join(os.path.dirname(__file__), '..', _filename)
+        _abs_filename = os.path.join(os.path.dirname(__file__), _filename)
         if not os.path.exists(_abs_filename):
             raise FileNotFoundError("Not Found {}, Pls touch a ip file".format(_abs_filename))
         self._filename = _abs_filename

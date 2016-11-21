@@ -9,8 +9,8 @@ from email.mime.audio import MIMEAudio
 from email.mime.multipart import MIMEMultipart
 from email.encoders import encode_base64
 import mimetypes
-from .MisExceptions import MailError
-from .MisExceptions import MailTypeError
+from miscellaneous.MisExceptions import MailError
+from miscellaneous.MisExceptions import MailTypeError
 
 
 class BaseSendEmail(object):

@@ -3,7 +3,7 @@
 
 import os
 import mimetypes
-from .MisExceptions import CacheError
+from miscellaneous.MisExceptions import CacheError
 
 
 class BasePlainFileDiffer(object):

@@ -2,10 +2,10 @@
 import ftplib
 import socket
 import os
-from .MisExceptions import FtpConnectError
-from .MisExceptions import FtpLoginError
-from .MisExceptions import FtpDownloadError
-from .MisExceptions import FtpUploadError
+from miscellaneous.MisExceptions import FtpConnectError
+from miscellaneous.MisExceptions import FtpLoginError
+from miscellaneous.MisExceptions import FtpDownloadError
+from miscellaneous.MisExceptions import FtpUploadError
 
 
 class BaseFtp(object):
