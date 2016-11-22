@@ -57,3 +57,13 @@ class CacheError(Exception):
     """
     add file into Differ exception
     """
+
+class DouBanNotLoginError(Exception):
+    """
+    login douban exception
+    """
+
+class DouBanCrawlNotCallError(Exception):
+    """
+    not call the crawl_people_href function
+    """
