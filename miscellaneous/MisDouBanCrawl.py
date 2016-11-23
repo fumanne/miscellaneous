@@ -8,71 +8,6 @@ import os
 import re
 from miscellaneous.MisExceptions import DouBanNotLoginError, DouBanCrawlNotCallError
 
-# main_url = 'https://www.douban.com'
-# login_url = 'https://accounts.douban.com/login'
-# mail_url= 'https://www.douban.com/doumail'
-# people_index_url = 'https://www.douban.com/people'
-#
-#
-# user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'
-# accept =  'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
-# accept_encoding = 'gzip, deflate, br'
-# accept_language = 'en,zh-CN;q=0.8,zh;q=0.6'
-#
-# my_header = {
-#     'User-Agent' : user_agent,
-#     'Accept'     : accept,
-#     'Accept-Encoding' : accept_encoding,
-#     'Accept-Language' : accept_language
-# }
-#
-# params = {
-#     'source'        :    None,
-#     'redir'         :   'https://www.douban.com',
-#     'form_email'    :   'xxxxxx',
-#     'form_password' :   'xxxxxx',
-#     'login'         :   '登录'
-# }
-#
-# html = requests.post(login_url)
-# captcha_url = ''
-# captcha_id  = ''
-# bs = BeautifulSoup(html.text)
-# for i in bs.find_all(name='img', attrs={'alt':'captcha', 'class':'captcha_image', 'id':'captcha_image'}):
-#     print(i)
-#     if hasattr(i, 'src'):
-#         captcha_url = i.get('src')
-#
-# for i in bs.find_all(name='input', attrs={'type':'hidden', 'name':'captcha-id'}):
-#     print(i)
-#     if hasattr(i, 'value'):
-#         captcha_id = i.get('value')
-#
-# print(captcha_url)
-# request.urlretrieve(captcha_url, filename='./captcha.png')
-#
-# answer = input('pls enter the character in the captcha.png: ')
-# params['captcha-solution'] = answer
-# params['captcha-id'] = captcha_id
-# print(params)
-#
-#
-# # r = requests.get(url)
-# # bs = BeautifulSoup(r.content)
-# # for i in bs.find_all(name='a'):
-# #     print(i)
-# s = requests.session()
-# #
-# #
-# rs = s.post(login_url, headers=my_header, data=params)
-# print(rs.url, rs.status_code, rs.history)
-#
-# ms = s.post(mail_url)
-# print(ms.status_code)
-
-
-
-
 
 class DouBanAuth(object):
     INDEX_URL = REDIR = 'https://www.douban.com'
@@ -115,7 +50,7 @@ class DouBanAuth(object):
         self.s.close()
 
     def _text_login_url(self):
-        html = self.s.get(self.url, headers=self.headers)
+        html = self.s.post(self.url, headers=self.headers)
         return BeautifulSoup(html.text, "html.parser")
 
 
@@ -175,7 +110,7 @@ class DouBanPeopleCrawl(DouBanAuth):
 
     def crawl_people_href(self, url=DouBanAuth.INDEX_URL, maxcount=100):
         if not self.islogin:
-            raise DouBanNotLoginError
+           raise DouBanNotLoginError
 
         html = self.s.post(url, headers=self.headers)
         bs = BeautifulSoup(html.text, "html.parser")
@@ -205,48 +140,58 @@ class DouBanPeopleAlbumCrawl(DouBanPeopleCrawl):
             raise DouBanCrawlNotCallError
 
         for i in map(lambda x: x+self.PHOTO_FLAG, self.cache):
-            print(i)
-            html = self.s.post(i, headers=self.headers)
+            html = requests.post(i, headers=self.headers)
+            # 由于self.s 是session实例 所以这边调用self.s.post的话 response 的页面会跳转redir 定义的
+            # 所有这边直接调用 request.post 方法.
             bs = BeautifulSoup(html.text, "html.parser")
-            for element in bs.find_all(name='a', attrs={'class': 'album_photo',
-                                                        'href': re.compile(self.ALUBM_PATTERN)}):
+            for element in bs.find_all(name='a', attrs={'href': re.compile(self.ALUBM_PATTERN),
+                                                        'class': 'album_photo'}):
                 yield element.get('href')
 
 
 class DouBanPeoplePhotosCrawl(DouBanPeopleAlbumCrawl):
-    PHOTO_PATTERN = 'https://www\.douban\.com/photos/photo/\w+'
+    PHOTO_PATTERN = 'https://www\.douban\.com/photos/photo/\w+/$'
 
     def __init__(self):
         super(DouBanPeoplePhotosCrawl, self).__init__()
-        self.photo_list = set()
-        self.photos = set()
+        self.album_list = set()
+        self.photos_list = set()
 
     def _craw_people_photos(self):
         for album in self.crawl_people_album():
-            html = self.s.post(album, headers=self.headers)
+            html = requests.post(album, headers=self.headers)
             bs = BeautifulSoup(html.text, "html.parser")
             for element in  bs.find_all(name='a', attrs={'href': re.compile(self.PHOTO_PATTERN),
                                                          'class': 'photolst_photo'}):
-                self.photo_list.add(element.get('href'))
-        return self.photo_list
+                self.album_list.add(element.get('href'))
+        return self.album_list
 
     def crawl_photo(self):
         for photo in self._craw_people_photos():
-            html = self.s.post(photo, headers=self.headers)
+            html = requests.post(photo, headers=self.headers)
             bs = BeautifulSoup(html.text, "html.parser")
             for element  in bs.find_all(name='a', attrs={'class': 'mainphoto',
                                          'href': re.compile(self.PHOTO_PATTERN)}):
                 for url in element.find_all(name='img'):
-                    self.photos.add(url.get('src'))
-        return self.photos
+                    self.photos_list.add(url.get('src'))
+        return self.photos_list
 
+
+
+def download(url):
+    location = os.path.join(os.path.dirname('__file__'), 'resource/img/')
+    download_file = os.path.join(location, url)
+    request.urlretrieve(url, filename=download_file)
 
 c = DouBanPeoplePhotosCrawl()
-c.login('289557306@qq.com', 'm64628288')
-c.crawl_people_href(maxcount=30)
+c.crawl_people_href(maxcount=10)
+print(c.cache)
+c._craw_people_photos()
+print(c.album_list)
+print(c.photos)
+for i in c.photos:
+    download(i)
 
-for i in c.crawl_people_album():
-    print(i)
 
 
 
