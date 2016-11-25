@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
 #
-# encapsulate the most useful service like Regions, EC2, VPC, RDS, IAM, S3, ElastiCache  in Chinese AWS.
+# Simply encapsulate the most useful service like Regions, EC2, VPC, RDS, IAM, S3, ElastiCache  in Chinese AWS.
 # List all attribute from different service as mentioned.
 #
 
