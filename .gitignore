@@ -9,3 +9,6 @@ __pycache__/
 
 # project
 .idea/
+
+#tmp directory
+img/
