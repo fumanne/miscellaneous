@@ -1,0 +1,11 @@
+# img, gif, png, jpg
+*.img
+*.gif
+*.png
+*.jpg
+
+# cache
+__pycache__/
+
+# project
+.idea/
