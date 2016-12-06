@@ -7,7 +7,9 @@ from miscellaneous.MisExceptions import CacheError
 
 
 class BasePlainFileDiffer(object):
-
+    """
+    加载 load 2个文件， 然后逐行比较
+    """
     def __new__(cls, name):
         self = object.__new__(cls)
         self._cache = []
