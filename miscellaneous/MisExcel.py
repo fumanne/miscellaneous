@@ -169,3 +169,4 @@ class MisCellWriter(object):
 
     def writer(self, data):
         return self.cls.row(self.rowx).write(self.colsx, data)
+
