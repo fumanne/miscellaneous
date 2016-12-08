@@ -55,7 +55,7 @@ class Dump(object):
         return self.dump()
 
 
-class MisSheet(Dump):
+class MisSheetReader(Dump):
     def __init__(self, sheet_obj):
         """
         :param sheet_obj:  is the sheet object, get from class::MisExcelReader.get_sheet_by_name or get_sheet_by_index
@@ -114,16 +114,16 @@ class MisSheet(Dump):
 class MisExcelWriter(object):
     def __init__(self):
         self.wt = xlwt.Workbook(encoding='utf-8')
-        self.name = None
         self.sheets = []
+        self.name = None
 
     @property
     def name(self):
-        return self.name
+        return self._name
 
     @name.setter
     def name(self, value):
-        self.name = value
+        self._name = value
 
 
     def add_sheet(self, sheet_name):
@@ -139,3 +139,33 @@ class MisExcelWriter(object):
         if filename is None:
             filename = self.name
         return self.wt.save(filename)
+
+class MisSheetWriter(object):
+    def __init__(self, sheet_obj):
+        self.sh = sheet_obj
+
+    @property
+    def name(self):
+       return self.sh.name
+
+    def row(self, rowx):
+        return self.sh.row(rowx)
+
+    def cols(self, colsx):
+        return self.sh.col(colsx)
+
+    def cell(self, rowx, colsx):
+        return MisCellWriter(self,rowx, colsx)
+
+
+class MisCellWriter(object):
+    def __init__(self, cls, rowx, colsx):
+        self.cls = cls
+        self.rowx = rowx
+        self.colsx = colsx
+
+    def __repr__(self):
+        return "{0}:<({1},{2})>".format(self.__class__.__name__, self.rowx, self.colsx)
+
+    def writer(self, data):
+        return self.cls.row(self.rowx).write(self.colsx, data)
