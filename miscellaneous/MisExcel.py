@@ -115,7 +115,7 @@ class MisExcelWriter(object):
     def __init__(self):
         self.wt = xlwt.Workbook(encoding='utf-8')
         self.sheets = []
-        self.name = None
+        self.name = "{0}.xlsx".format(self.__class__.__name__)
 
     @property
     def name(self):
