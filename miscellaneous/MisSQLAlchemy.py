@@ -59,9 +59,11 @@ class User2Course(base):
     course_obj = relationship('Course')
 
     def __repr__(self):
-        return "{0}(user_id={1}, course_id={2}, select_time={3})".format(self.__class__.__name__,
-                                                                                   self.user_id, self.course_id,
-                                                                           self.select_time)
+        return "{0}(user_id={0}, user_name={1}, course_id={2},  course_name={3}, select_time={4})".format(self.__class__.__name__,
+                                                                                                     self.user_id, self.user_name,
+                                                                                                     self.course_id,
+                                                                                                     self.course_name,
+                                                                                                     self.select_time)
 
 user1 = User(name='test1', age=10, password='test1')
 user2 = User(name='test2', age=12, password='test2')
@@ -89,8 +91,8 @@ for i in all_uid:
         u2c.course_id = j.id
         u2c.course_name = j.name
         session.add(u2c)
+
 session.commit()
 
-
-for i in session.query(User2Course).all():
+for i in session.query(User2Course):
     print(i)
