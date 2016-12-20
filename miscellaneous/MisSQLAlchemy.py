@@ -25,7 +25,7 @@ class User(base):
     age = Column(Integer)
     password = Column(String(64))
 
-    user2course = relationship('User2Course')
+
 
     def __repr__(self):
         return "{0}(name={1}, age={2}, password={3})".format(self.__class__.__name__, self.name,
@@ -39,7 +39,7 @@ class Course(base):
     score = Column(Integer, default=2, nullable=False)
     start_time = Column(DateTime, default=datetime.datetime.utcnow())
 
-    user2course = relationship('User2Course')
+
 
     def __repr__(self):
         return "{0}(name={1}, score={2}, start_time={3})".format(self.__class__.__name__, self.name,
@@ -50,20 +50,23 @@ class User2Course(base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column('uid', Integer, ForeignKey(User.id), index=True)
-    user_name = Column('uname', String)
+    user_name = Column('uname', String, ForeignKey(User.name))
     course_id = Column('cid', Integer, ForeignKey(Course.id), index=True)
-    course_name = Column('cname', String)
+    course_name = Column('cname', String, ForeignKey(Course.name))
     select_time = Column(DateTime, default=datetime.datetime.utcnow())
 
-    user_obj = relationship('User')
-    course_obj = relationship('Course')
+    _user_id = relationship(User, primaryjoin='User.id == User2Course.user_id')
+    _user_name = relationship(User, primaryjoin='User.name == User2Course.user_name')
+    _course_id = relationship(Course, primaryjoin='Course.id == User2Course.course_id')
+    _course_name = relationship(Course, primaryjoin='Course.name == User2Course.course_name')
+
 
     def __repr__(self):
-        return "{0}(user_id={0}, user_name={1}, course_id={2},  course_name={3}, select_time={4})".format(self.__class__.__name__,
-                                                                                                     self.user_id, self.user_name,
-                                                                                                     self.course_id,
-                                                                                                     self.course_name,
-                                                                                                     self.select_time)
+        return "{0}(user_id={0}, user_name={1}, course_id={2},  course_name={3}, select_time={4})".format(self.user_id,
+                                                                                                          self.user_name,
+                                                                                                          self.course_id,
+                                                                                                          self.course_name,
+                                                                                                          self.select_time)
 
 user1 = User(name='test1', age=10, password='test1')
 user2 = User(name='test2', age=12, password='test2')
