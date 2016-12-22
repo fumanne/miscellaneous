@@ -220,6 +220,10 @@ class AMD(object):
     def lineno(self):
         return self.number
 
+    @property
+    def info(self):
+        return "{} -- In line num:{} ==> {}".format(self.__class__.__name__, self.lineno, self.content)
+
 
 class Adder(AMD):
     def __init__(self, msg, number):
@@ -232,6 +236,8 @@ class Adder(AMD):
         return "{0}({1})".format(self.__class__.__name__, Line(self.number))
 
 
+
+
 class Deleter(AMD):
     def __init__(self, msg, number):
         self.msg = msg
@@ -240,6 +246,8 @@ class Deleter(AMD):
 
     def __repr__(self):
         return "{0}({1})".format(self.__class__.__name__, Line(self.number))
+
+
 
 
 class Modify(AMD):
@@ -262,4 +270,5 @@ class Modify(AMD):
     @property
     def content(self):
         return self.before, self.after
+
 
