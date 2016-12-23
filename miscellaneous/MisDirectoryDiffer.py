@@ -1,13 +1,14 @@
 #! -*- coding: utf-8 -*-
 
-from miscellaneous.MisPlainFileDiffer import  BasePlainFileDiffer
+from miscellaneous.MisPlainFileDiffer import BasePlainFileDiffer
 import os
 
 def scandir(dir):
-    for root, dir, filenames in os.walk(dir):
+    for root, directory, filenames in os.walk(dir):
         for filename in filenames:
             if not filename.startswith('.'):
-                yield  os.path.join(root,filename)
+                yield os.path.join(root, filename)
+
 
 class BaseDirectoryDiffer(object):
     """
@@ -67,7 +68,6 @@ class BaseDirectoryDiffer(object):
                     _item.append(x)
             res.append(_item)
         return res
-
 
     def differ(self):
         if len(self.files) != 2 and len(self.files) != 1:
