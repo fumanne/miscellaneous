@@ -9,32 +9,42 @@
 
 import psutil
 import subprocess
+import logging
+import sys
+
+log = logging.getLogger()
+log.setLevel(logging.NOTSET)
+fh=logging.FileHandler('cron.log')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+fh.setFormatter(formatter)
+log.addHandler(fh)
+
 
 class CronDelete(object):
     def __init__(self, maxdate=4):
         self.maxdate = maxdate
-        self._ST = maxdate
         self.flag = 0
 
 
     def _check_flag(self):
-        return  0 <= self.flag < self._ST
+        return  0 <= self.flag < self.maxdate
 
-    def reset(self):
+    def increase(self):
         self.flag += 1
 
     def _call_bash(self):
 
-        script = '/Users/kc-fu/shell/abc.sh'
+        script = '/bin/custom.sh'
         bash = '/bin/bash'
         args = str(self.maxdate - self.flag)
         cmd_list = [bash, script, args]
         p = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(args)
         if p.wait() == 0:
-            return p.returncode, p.stdout
+            for data in p.stdout.readlines():
+                log.debug(data.decode('utf-8'))
         else:
-            return p.returncode, p.stderr
+            for data in p.stderr.readlines():
+                log.critical(data.decode('utf-8'))
 
     def disk_usage(self):
         res = psutil.disk_usage('/')
@@ -47,11 +57,11 @@ class CronDelete(object):
         if self._check_flag():
             self._call_bash()
         else:
-            raise ValueError
+            log.debug('the flag is over the max')
+            sys.exit(-1)
 
 if __name__ == "__main__":
     cron = CronDelete()
     while cron.check_usage():
         cron.do()
-        cron.reset()
-        print(cron.flag)
+        cron.increase()
