@@ -11,6 +11,7 @@ import psutil
 import subprocess
 import logging
 import sys
+import math
 
 log = logging.getLogger()
 log.setLevel(logging.NOTSET)
@@ -48,7 +49,7 @@ class CronDelete(object):
 
     def disk_usage(self):
         res = psutil.disk_usage('/')
-        return int(res.percent)
+        return math.ceil(res.percent)
 
     def check_usage(self):
         return self.disk_usage() > 80
