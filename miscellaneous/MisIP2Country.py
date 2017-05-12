@@ -1,6 +1,6 @@
 #! -*- coding: utf-8 -*-
 
-import os
+import os, sys
 import socket
 import struct
 import re
@@ -9,10 +9,20 @@ from collections import namedtuple
 from miscellaneous.MisExceptions import FileNotFoundError
 from miscellaneous.MisExceptions import IP2CountryStatusError
 from urllib.request import urlopen
-
+from binascii import hexlify
+import ipaddress
 
 class IP2Country(object):
-    IP_REGEX = "^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+    IPv4_REGEX = "^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+    IPv6_REGEX = "^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|\
+(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|\
+(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|\
+(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|\
+(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|\
+(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|\
+(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|\
+(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))$"
+
 
     def __init__(self):
         self._DBSearcher = None
@@ -44,8 +54,9 @@ class IP2Country(object):
 
     @staticmethod
     def filter_wrong_ip(ip):
-        ip_regex = re.compile(IP2Country.IP_REGEX)
-        return re.match(ip_regex, ip) is not None
+        ip_regex_v4 = re.compile(IP2Country.IPv4_REGEX)
+        ip_regex_v6 = re.compile(IP2Country.IPv6_REGEX)
+        return re.match(ip_regex_v4, ip) is not None  or re.match(ip_regex_v6, ip) is not None
 
     def search(self, *args):
         """
@@ -53,7 +64,7 @@ class IP2Country(object):
         :return: dict key ==> ip value ==> country
         """
         if not self.status:
-            raise IP2CountryStatusError("is not set")
+            raise IP2CountryStatusError("method is not set")
         result = dict()
         for i in filter(self.filter_wrong_ip, args):
             if self._FileSearcher:
@@ -70,13 +81,24 @@ class IP2Country(object):
 
 class Util(object):
     @classmethod
-    def ip2long(cls, ip):
-        return struct.unpack("!L", socket.inet_aton(ip))[0]
+    def ip2long(self, ip):
+        # IPV6:
+        #      also can use ipaddress module when python version > 3.3
+        #      example:
+        #      import ipaddress
+        #      int(ipaddress.ip_address('fe80::21b:77ff:fbd6:7860'))
+
+        if re.match(IP2Country.IPv4_REGEX, ip):
+            return struct.unpack("!L", socket.inet_aton(ip))[0]
+        elif re.match(IP2Country.IPv6_REGEX, ip):
+            return int(hexlify(socket.inet_pton(socket.AF_INET6, ip)), 16)
 
     @classmethod
-    def long2ip(cls, long):
-        return socket.inet_ntoa(struct.pack("!L", long))
-
+    def long2ip(self, long):
+        if sys.version_info.major >= 3 and sys.version_info.minor >=3:
+            return ipaddress.ip_address(long).compressed
+        else:
+            return socket.inet_ntoa(struct.pack("!L", long))
 
 class IPv4Range(namedtuple('IPv4Range', ['start_long_ip', 'end_long_ip', 'country'])):
     """
@@ -108,7 +130,7 @@ class Resource(object):
         _filename = 'resource/ip.tsv'
         _abs_filename = os.path.join(os.path.dirname(__file__), _filename)
         if not os.path.exists(_abs_filename):
-            raise FileNotFoundError("Not Found {}, Pls touch a ip file".format(_abs_filename))
+            raise FileNotFoundError("Not Found {}, Pls create a ip file".format(_abs_filename))
         self._filename = _abs_filename
 
     @property
@@ -222,7 +244,7 @@ def allrepos():
 class RegionInternetRepo(object):
 
     @staticmethod
-    def is_ipv4(record):
+    def is_ipflag(record):
         # TODO, whether can be used with abstract method by abc class?
         return NotImplementedError()
 
@@ -237,7 +259,7 @@ class RegionInternetRepo(object):
         return words[6] != 'allocated' and words[6] != 'assigned'
 
     @staticmethod
-    def parse_ipv4(record):
+    def parse_ip(record):
         words = record.split('|')
         country = words[1]
         start_ip = words[3]
@@ -255,17 +277,17 @@ class RegionInternetRepo(object):
         with urlopen(self.download_url) as fp:
             for record in fp:
                 record = record.decode('utf-8').strip()
-                if self.is_ipv4(record) and not self.skip_record(record):
-                    result.append(self.parse_ipv4(record))
+                if self.is_ipflag(record) and not self.skip_record(record):
+                    result.append(self.parse_ip(record))
         return result
 
 
 class StandardFileFormatRegionInternetRepo(RegionInternetRepo):
 
     @staticmethod
-    def is_ipv4(record):
+    def is_ipflag(record):
         words = record.split('|')
-        if len(words) == 7 and words[2] == 'ipv4':
+        if len(words) == 7 and re.match('^ipv.*$', words[2]):
             return True
         else:
             return False
@@ -273,9 +295,9 @@ class StandardFileFormatRegionInternetRepo(RegionInternetRepo):
 
 class ExtendedFileFormatRegionInternetRepo(RegionInternetRepo):
     @staticmethod
-    def is_ipv4(record):
+    def is_ipflag(record):
         words = record.split('|')
-        if len(words) == 8 and words[2] == 'ipv4':
+        if len(words) == 8 and re.match('^ipv.*$', words[2]):
             return True
         else:
             return False
@@ -330,3 +352,11 @@ class ARIN(ExtendedFileFormatRegionInternetRepo):
     def download_url(self):
         return 'http://ftp.apnic.net/stats/arin/delegated-arin-extended-latest'
 
+
+
+if __name__ == "__main__":
+    ip2c = IP2Country()
+    ip2c.set('db')
+    print(ip2c.method)
+    ip2c.update()
+    print(ip2c.search('fe80::21b:77ff:fbd6:7860'))

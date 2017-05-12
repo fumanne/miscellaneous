@@ -131,7 +131,7 @@ class DouBanPeopleCrawl(DouBanAuth):
             for url in self.cache - self._handle_cache:
                 self._handle_cache.add(url)
                 return self.crawl_people_href(url, maxcount)
-
+        print(self.cache)
         return self.cache
 
     def clear_cache(self):
@@ -190,11 +190,13 @@ def download(url, location=None):
     download_file = os.path.join(location, name)
     request.urlretrieve(url, filename=download_file)
 
-"""
-Usage:
-c = DouBanPeoplePhotosCrawl()
-c.login('xxxxx', 'yyyyy')
-c.crawl_people_href(maxcount=100) # to genrate cache data.
-for i in c.crawl_photo():
-    download(i)
-"""
+
+
+
+# #Usage:
+# c = DouBanPeoplePhotosCrawl()
+# c.login('xxxxx', 'yyy')
+# c.crawl_people_href(maxcount=10) # to genrate cache data.
+# for i in c.crawl_photo():
+#     download(i)
+# #"""

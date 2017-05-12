@@ -34,6 +34,8 @@ class BaseDB(object):
                 self.conn = _conn
                 self.is_connected = True
                 return self.conn
+        else:
+            return self.conn
 
     def cursor(self, **kwargs):
         all_keys = ('buffered', 'raw', 'prepared', 'dictionary', 'named_tuple')
