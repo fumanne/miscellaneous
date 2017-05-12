@@ -52,11 +52,11 @@ class IP2Country(object):
     def status(self):
         return self._FileSearcher is not None or self._DBSearcher is not None
 
-    @staticmethod
-    def filter_wrong_ip(ip):
-        ip_regex_v4 = re.compile(IP2Country.IPv4_REGEX)
-        ip_regex_v6 = re.compile(IP2Country.IPv6_REGEX)
-        return re.match(ip_regex_v4, ip) is not None  or re.match(ip_regex_v6, ip) is not None
+    # @staticmethod
+    # def filter_wrong_ip(ip):
+    #     ip_regex_v4 = re.compile(IP2Country.IPv4_REGEX)
+    #     ip_regex_v6 = re.compile(IP2Country.IPv6_REGEX)
+    #     return re.match(ip_regex_v4, ip) is not None  or re.match(ip_regex_v6, ip) is not None
 
     def search(self, *args):
         """
@@ -66,7 +66,7 @@ class IP2Country(object):
         if not self.status:
             raise IP2CountryStatusError("method is not set")
         result = dict()
-        for i in filter(self.filter_wrong_ip, args):
+        for i in args:
             if self._FileSearcher:
                 result[i] = self._FileSearcher.search(i)
 
@@ -358,5 +358,5 @@ if __name__ == "__main__":
     ip2c = IP2Country()
     ip2c.set('db')
     print(ip2c.method)
-    ip2c.update()
-    print(ip2c.search('fe80::21b:77ff:fbd6:7860'))
+    ip2c.set('file')
+    print(ip2c.search('2c0f:feb1::', '2c0f:feb8::'))
