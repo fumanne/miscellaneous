@@ -3,3 +3,10 @@ os: linux
 files:
   - source: /
     destination: /home/ec2-user/work
+permissions:
+  - object: /home/ec2-user/work
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    mode: 755
+    
