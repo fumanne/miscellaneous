@@ -47,7 +47,7 @@ class EC2(SimplyAWSAbstract):
         self.con = self._connect_to_region(**kwargs)
 
     def _connect_to_region(self, **kwargs):
-        if not self._isRegionInfo:
+        if self._isRegionInfo:
             return EC2Connection(aws_access_key_id=self.aws_access_key_id,
                                  aws_secret_access_key=self.aws_secret_access_key,
                                  **kwargs)

@@ -92,7 +92,7 @@ class MisSheetReader(Dump):
         if start_cols > self.ncols or end_colx > self.ncols:
             raise IndexError('Out of range')
         if not end_colx:
-            end_colx=self.ncols
+            end_colx = self.ncols
         return self.sheet.row_values(rowx, start_cols, end_colx)
 
     def col_values(self, colx, start_rows=0, end_rows=None):
