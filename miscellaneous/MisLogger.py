@@ -3,8 +3,22 @@
 import os
 import logging
 
+class Singleton(type):
 
-class BaseLogger(object):
+    def __new__(cls, *args, **kwargs):
+        _cls = super(Singleton, cls).__new__(cls, *args, **kwargs)
+        _cls._instance = None
+        return _cls
+
+    def __call__(cls, *args, **kwargs):
+        if not cls._instance:
+            inst = cls.__new__(cls, *args, **kwargs)
+            cls._instance = inst
+        return cls._instance
+
+
+
+class BaseLogger(metaclass=Singleton):
     LOGGER_DIR = "logs"
 
     def __init__(self, name):
@@ -35,3 +49,8 @@ class BaseLogger(object):
         def do_otherthings(self):
             self.logger.debug('BALA BALA')
 """
+
+bl = BaseLogger('test')
+tl = BaseLogger('fuck')
+print(id(bl))
+print(id(tl))

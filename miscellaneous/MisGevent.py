@@ -7,19 +7,19 @@ import time
 start = time.time()
 
 def func1():
-    print('Starting Polling: %1.3f' %(time.time() - start))
+    print('func1  Starting Polling: %1.3f' %(time.time() - start))
     select.select([], [], [], 2)
-    print('Ended Polling: %1.3f' %(time.time() - start))
+    print('func1 Ended Polling: %1.3f' %(time.time() - start))
 
 def func2():
-    print('Staring Polling: %1.3f' %(time.time() - start))
+    print('func2 Starting Polling: %1.3f' %(time.time() - start))
     select.select([], [], [], 2)
-    print('Ended Polling: %1.3f' %(time.time() - start))
+    print('func2 Ended Polling: %1.3f' %(time.time() - start))
 
 def func3():
-    print('Now Sleep start....%1.3f' %(time.time() - start))
+    print('func3 Now Sleep start....%1.3f' %(time.time() - start))
     gevent.sleep(5)
-    print('End ALL %s' %(time.time() - start))
+    print('func3 End ALL %s' %(time.time() - start))
 
 
 gevent.joinall([gevent.spawn(func1), gevent.spawn(func2), gevent.spawn(func3)])
@@ -76,4 +76,5 @@ try:
 except Timeout:
     print('Could not complete')
 
-dict
+
+import collections
