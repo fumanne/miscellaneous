@@ -49,8 +49,3 @@ class BaseLogger(metaclass=Singleton):
         def do_otherthings(self):
             self.logger.debug('BALA BALA')
 """
-
-bl = BaseLogger('test')
-tl = BaseLogger('fuck')
-print(id(bl))
-print(id(tl))

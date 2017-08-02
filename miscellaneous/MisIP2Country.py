@@ -355,6 +355,7 @@ class ARIN(ExtendedFileFormatRegionInternetRepo):
 
 
 if __name__ == "__main__":
+    #IP2Country.update()
     ip2c = IP2Country()
-    ip2c.set('file')
-    print(ip2c.search('2c0f:feb1::', '2c0f:feb8::', '2404:68:4001:805::1006'))
+    ip2c.set('db')
+    print(ip2c.search('59.153.241.78'))
