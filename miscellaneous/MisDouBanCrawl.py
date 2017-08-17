@@ -6,6 +6,7 @@ import requests
 from urllib import request
 import os
 import re
+import getpass
 from miscellaneous.MisExceptions import DouBanNotLoginError, DouBanCrawlNotCallError
 
 
@@ -20,7 +21,7 @@ class DouBanAuth(object):
         self.s = requests.session()
 
         _user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36'
-        _accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+        _accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/jpg,*/*;q=0.8'
         _accept_encoding = 'gzip, deflate, br'
         _accept_language = 'en,zh-CN;q=0.8,zh;q=0.6'
         _content_type = 'application/x-www-form-urlencoded'
@@ -87,13 +88,13 @@ class DouBanAuth(object):
         if data:
             return data
 
-    def _prepare_login(self, user, password):
+    def _prepare_login(self, user):
         self.auth['form_email'] = user
-        self.auth['form_password'] = password
+        self.auth['form_password'] = getpass.getpass(prompt='Password for %s:' %user )
         return self.auth
 
-    def login(self, user, password):
-        self._prepare_login(user, password)
+    def login(self, user):
+        self._prepare_login(user)
         rs = self.s.post(self.url, headers=self.headers, data=self.auth)
 
         if rs.status_code == 200 and rs.url == self.REDIR:
@@ -195,8 +196,8 @@ def download(url, location=None):
 
 # #Usage:
 # c = DouBanPeoplePhotosCrawl()
-# c.login('xxxxx', 'yyy')
+# c.login('289557306@qq.com')
 # c.crawl_people_href(maxcount=10) # to genrate cache data.
 # for i in c.crawl_photo():
-#     download(i)
+#      download(i)
 # #"""
