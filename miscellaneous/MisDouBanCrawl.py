@@ -1,14 +1,14 @@
 #! -*- coding: utf-8 -*-
 
-
+import threading
 from bs4 import BeautifulSoup
 import requests
 from urllib import request
 import os
 import re
 import getpass
-from miscellaneous.MisExceptions import DouBanNotLoginError, DouBanCrawlNotCallError
-
+from MisExceptions import DouBanNotLoginError, DouBanCrawlNotCallError
+import queue
 
 class DouBanAuth(object):
     INDEX_URL = REDIR = 'https://www.douban.com'
@@ -115,8 +115,7 @@ class DouBanPeopleCrawl(DouBanAuth):
     def crawl_people_href(self, url=DouBanAuth.INDEX_URL, maxcount=100):
         """
         :param url:
-        :param maxcount: It do not mean how many people you should crawl, it accurate mean at least!
-        so the cache's number may be more than maxcount
+        :param maxcount: scrap how many people
         :return: cache
         """
         if not self.islogin:
@@ -132,7 +131,7 @@ class DouBanPeopleCrawl(DouBanAuth):
             for url in self.cache - self._handle_cache:
                 self._handle_cache.add(url)
                 return self.crawl_people_href(url, maxcount)
-        print(self.cache)
+        print(len(self.cache))
         return self.cache
 
     def clear_cache(self):
@@ -195,9 +194,41 @@ def download(url, location=None):
 
 
 # #Usage:
-# c = DouBanPeoplePhotosCrawl()
-# c.login('289557306@qq.com')
-# c.crawl_people_href(maxcount=10) # to genrate cache data.
+
 # for i in c.crawl_photo():
 #      download(i)
 # #"""
+
+class MulitiDownload(threading.Thread):
+    def __init__(self, q):
+        self.q = q
+        super(MulitiDownload, self).__init__()
+
+    def run(self):
+        while True:
+            url = self.q.get()
+            self._download(url)
+            self.q.task_done()
+
+    def _download(self, url, location=None):
+        location = os.path.join(os.path.dirname('__file__'), 'resource/img/') if not location else location
+        item = request.urlparse(url)
+        name = item.path.split('/')[-1]
+        download_file = os.path.join(location, name)
+        request.urlretrieve(url, filename=download_file)
+
+c = DouBanPeoplePhotosCrawl()
+c.login('289557306@qq.com')
+c.crawl_people_href() # to genrate cache data.
+print(c.cache)
+
+
+q = queue.Queue()
+for i in range(5):
+    md = MulitiDownload(q)
+    print(id(md))
+    md.start()
+
+for url in c.crawl_photo():
+    q.put(url)
+q.join()
