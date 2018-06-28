@@ -24,7 +24,7 @@ class BaseLogger(metaclass=Singleton):
     def __init__(self, name):
         self.name = name
         logger = logging.getLogger(self.name)
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.DEBUG)
         self.file_name = os.path.join(os.path.dirname(__file__), BaseLogger.LOGGER_DIR, '%s.log' % self.name)
         handler = logging.FileHandler(self.file_name)
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(lineno)d In %(filename)s")
