@@ -14,7 +14,7 @@ python-dateutil==2.6.0
 pytz==2016.7
 recordtype==1.1
 redis==2.10.5
-requests==2.11.1
+requests=2.20.0
 six==1.10.0
 slacker==0.9.29
 SQLAlchemy==1.1.4
